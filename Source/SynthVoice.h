@@ -116,25 +116,11 @@ public:
         env1.setRelease(*release);
     }
     
-    void getFilterEnvelopeParams(float* fattack, float* fdecay, float* fsustain, float* frelease)
-    {
-        env2.setAttack(*fattack);
-        env2.setDecay(*fdecay);
-        env2.setSustain(*fsustain);
-        env2.setRelease(*frelease);
-    }
-    
-    
     //=======================================================
     
     double setEnvelope()
     {
         return env1.adsr(setOscType(), env1.trigger);
-    }
-    
-    double setFilterEnvelope()
-    {
-        return env2.adsr(setOscType(), env2.trigger);
     }
     
     //=======================================================
@@ -147,6 +133,25 @@ public:
         pitchBendUpSemitones = *pbup;
         pitchBendDownSemitones = *pbdn;
     }
+    
+    //=======================================================
+    
+    void getFilterEnvelopeParams(float* fattack, float* fdecay, float* fsustain, float* frelease)
+    {
+        env2.setAttack(*fattack);
+        env2.setDecay(*fdecay);
+        env2.setSustain(*fsustain);
+        env2.setRelease(*frelease);
+    }
+    
+    //=======================================================
+    
+    double setFilterEnvelope()
+    {
+        return env2.adsr(setOscType(), env2.trigger);
+    }
+    
+    //=======================================================
     
     void getFilterParams (float* filterType, float* filterCutoff, float* filterRes)
     {
@@ -168,6 +173,7 @@ public:
     {
         noteNumber = midiNoteNumber;
         env1.trigger = 1;
+        env2.trigger = 1;
         setPitchBend(currentPitchWheelPosition);
         frequency = noteHz(noteNumber, pitchBendCents());
         level = velocity;
@@ -178,16 +184,12 @@ public:
     void stopNote (float velocity, bool allowTailOff) override
     {
         env1.trigger = 0;
-        allowTailOff = true;
-        
-        if (velocity == 0)
-            clearCurrentNote();
-        
         env2.trigger = 0;
         allowTailOff = true;
         
         if (velocity == 0)
             clearCurrentNote();
+        
     }
     
     //=======================================================
@@ -213,6 +215,9 @@ public:
         {
             for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
             {
+            
+              //not sure how to initiate (setFilterEnvelope() * cutoff) here
+              
                 outputBuffer.addSample(channel, startSample, setEnvelope() * masterGain);
             }
             ++startSample;
