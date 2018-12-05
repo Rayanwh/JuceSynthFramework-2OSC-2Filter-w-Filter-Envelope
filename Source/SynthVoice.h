@@ -216,7 +216,7 @@ public:
             for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
             {
             
-              //not sure how to initiate (setFilterEnvelope() * cutoff) here
+              //not sure how to properly insert setFilterEnvelope() to manipulate cutoff and cutoff2 below.
               
                 outputBuffer.addSample(channel, startSample, setEnvelope() * masterGain);
             }
